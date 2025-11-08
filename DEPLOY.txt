@@ -1,0 +1,54 @@
+========================================
+DEPLOY INSTRUCTIONS - COPY & PASTE
+========================================
+
+1. DEPLOY TO CLOUD RUN
+-----------------------
+cd dialogflow-cx-agent-assist-ready
+gcloud builds submit --config=cloudbuild.yaml --project=chennai-geniai
+
+
+2. SETUP FIRESTORE
+------------------
+gcloud firestore databases create --location=us-central1 --project=chennai-geniai
+
+
+3. GRANT PERMISSIONS
+--------------------
+gcloud projects add-iam-policy-binding chennai-geniai --member="serviceAccount:service-372848468363@gcp-sa-dialogflow.iam.gserviceaccount.com" --role="roles/datastore.user"
+
+gcloud projects add-iam-policy-binding chennai-geniai --member="serviceAccount:372848468363-compute@developer.gserviceaccount.com" --role="roles/datastore.user"
+
+
+4. GET WEBHOOK URL
+------------------
+gcloud run services describe dialogflow-cx-agent-assist --region=us-central1 --format="value(status.url)" --project=chennai-geniai
+
+
+5. CONFIGURE DIALOGFLOW CX
+--------------------------
+Go to: https://dialogflow.cloud.google.com/cx/projects/chennai-geniai/locations/us-central1/agents/be40e635-daec-437d-8d1f-d1b97344d773/webhooks
+
+Click: Create
+Name: Agent-Assist-Webhook
+URL: [paste URL from step 4]/api/webhook
+Timeout: 30 seconds
+Save
+
+Then:
+Go to: Default Start Flow -> Start Page
+Enable: Webhook in Fulfillment
+Select: Agent-Assist-Webhook
+Save
+
+
+6. TEST
+-------
+Dialogflow CX Console -> Test Agent
+Type: "What is quantum computing?"
+Verify: Webhook called, data in Firestore
+
+
+========================================
+DONE! Your agent assist is live.
+========================================
