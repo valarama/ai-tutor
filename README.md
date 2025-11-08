@@ -1,151 +1,282 @@
-# Dialogflow CX Agent Assist - Ready to Deploy
+# 🎓 AI Tutor - Educational Platform with Google Cloud AI
 
-## 🚀 Quick Deploy (3 Commands)
+![Next.js](https://img.shields.io/badge/Next.js-14.2.5-black?logo=next.js&logoColor=white)
+![Google Cloud](https://img.shields.io/badge/Google%20Cloud-Platform-blue?logo=google-cloud)
+![Vertex AI](https://img.shields.io/badge/Vertex%20AI-Gemini-orange?logo=google)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Build](https://img.shields.io/badge/build-passing-brightgreen)
 
-### 1. Deploy to Cloud Run
+> AI-powered educational platform with real-time voice sessions, multi-model Gemini AI, and embedded communications. Built entirely on Google Cloud Platform.
+
+[🚀 Live Demo](https://dialogflow-cx-agent-assist-f5izewubea-uc.a.run.app) | [💖 Support](#support-this-project) | [📚 Documentation](#api-documentation)
+
+---
+
+## ✨ Features
+
+- 🎤 **Live Voice Sessions** - Real-time transcription with Dialogflow CX
+- 🤖 **Multi-Model AI** - Gemini 2.0 Flash, 2.5 Flash, Thinking
+- 💬 **AI Chatbot Tutor** - Voice-enabled educational assistant (Gami)
+- 📞 **Embedded Communications** - Voice & video calls via RingCentral
+- 📊 **AI Analytics** - One-click session summaries
+- 🔄 **Real-time Sync** - Firestore live database
+
+---
+
+## 🏗️ System Architecture
+
+<div align="center">
+
+![AI Tutor Architecture](architecture.png)
+
+*Complete system architecture showing data flow from frontend to Google Cloud services*
+
+</div>
+
+### 🔧 Technical Architecture
+
+Our platform follows a modern serverless architecture pattern, leveraging Google Cloud Platform's managed services for maximum scalability and reliability.
+
+#### **Frontend (Next.js 14)**
+- Server-side rendered React application
+- Client-side state management with React Hooks
+- Real-time UI updates via Firestore listeners
+- Responsive design with Tailwind CSS
+
+#### **API Routes (Serverless Functions)**
+
+| Endpoint | Function | Technology |
+|----------|----------|------------|
+| 🔄 conversations | Session management | Firestore queries |
+| 📝 transcript | Parse & format transcripts | String processing |
+| 🤖 chatbot | AI tutor responses | Vertex AI Gemini |
+| ✨ gemini-summary | Generate summaries | Vertex AI (3 models) |
+| 📞 ringcentral-video | Create meetings | RingCentral REST API |
+| 🗣️ voice-call | Initiate calls | RingCentral Ring-Out |
+
+#### **Backend Services**
+
+**Google Cloud Firestore**
+- Real-time NoSQL database
+- Automatic synchronization
+- Offline support
+- ACID transactions
+
+**Vertex AI (Gemini Models)**
+- Gemini 2.0 Flash: Speed-optimized responses
+- Gemini 2.5 Flash: Balanced performance
+- Gemini Thinking: Deep reasoning capabilities
+
+**Cloud Run**
+- Serverless container platform
+- Auto-scaling (0 to N instances)
+- Pay-per-use pricing
+- HTTPS endpoints with custom domains
+
+**RingCentral Platform**
+- Voice calling (Ring-Out API)
+- Video meetings (Meetings API)
+- WebRTC support
+- Enterprise-grade quality
+
+#### **Data Flow**
+```
+┌─────────────────────────────────────────────────────┐
+│  User Interaction (Browser/Mobile)                  │
+└────────────────────┬────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────┐
+│  Dialogflow CX (Voice Interface)                     │
+│  • Speech-to-Text                                    │
+│  • Intent Recognition                                │
+│  • Session Management                                │
+└────────────────────┬────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────┐
+│  Firestore (Data Persistence)                        │
+│  • sessionId, audioTranscript, turns[], status      │
+└────────────────────┬────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────┐
+│  Next.js Frontend (Real-time Updates)                │
+│  • Fetches via /api/conversations                    │
+│  • Displays in sidebar + main view                   │
+└────────────────────┬────────────────────────────────┘
+                     │
+        ┌────────────┼────────────┐
+        ▼            ▼            ▼
+┌─────────────┐ ┌─────────┐ ┌──────────────┐
+│ AI Features │ │Analytics│ │Communications│
+│ (Vertex AI) │ │(Summary)│ │(RingCentral) │
+└─────────────┘ └─────────┘ └──────────────┘
+```
+
+### 🚀 Deployment Pipeline
+```
+Developer Push → GitHub → Cloud Build → Docker Build
+                                            ↓
+                              Container Registry (GCR)
+                                            ↓
+                              Cloud Run Deployment
+                                            ↓
+                              Production (HTTPS endpoint)
+```
+
+**Build Time:** ~3 minutes  
+**Zero Downtime:** Blue-green deployments  
+**Auto-scaling:** 0 to 100+ instances
+
+---
+
+## 🛠️ Tech Stack
+
+**Frontend:** Next.js 14, React 18, Tailwind CSS  
+**Backend:** Firestore, Vertex AI, Dialogflow CX, Cloud Run  
+**Communications:** RingCentral API  
+**DevOps:** Cloud Build, Docker, GitHub
+
+---
+
+## 🚀 Quick Start
 ```bash
-cd dialogflow-cx-agent-assist-ready
-gcloud builds submit --config=cloudbuild.yaml --project=chennai-geniai
+# Clone repository
+git clone https://github.com/valarama/ai-tutor.git
+cd ai-tutor
+
+# Install dependencies
+npm install
+
+# Configure environment
+cp .env.local.example .env.local
+# Edit .env.local with your credentials
+
+# Run development server
+npm run dev
+
+# Open http://localhost:3000
 ```
 
-### 2. Setup Firestore
+---
+
+## 📦 Deployment
 ```bash
-gcloud firestore databases create --location=us-central1 --project=chennai-geniai
-```
-
-### 3. Grant Permissions
-```bash
-gcloud projects add-iam-policy-binding chennai-geniai --member="serviceAccount:service-372848468363@gcp-sa-dialogflow.iam.gserviceaccount.com" --role="roles/datastore.user"
-
-gcloud projects add-iam-policy-binding chennai-geniai --member="serviceAccount:372848468363-compute@developer.gserviceaccount.com" --role="roles/datastore.user"
+# Deploy to Google Cloud Run
+gcloud builds submit --config=cloudbuild.yaml --project=YOUR_PROJECT_ID
 ```
 
 ---
 
-## 📋 What's Included
+## 💖 Support This Project
 
-```
-dialogflow-cx-agent-assist-ready/
-├── app/
-│   ├── api/
-│   │   ├── webhook/route.js          # Dialogflow CX webhook
-│   │   ├── conversations/route.js    # List conversations
-│   │   ├── transcript/route.js       # Get conversation details
-│   │   └── chatbot/route.js          # AI chatbot
-│   ├── layout.js                      # App layout
-│   └── page.js                        # Dashboard homepage
-│
-├── package.json                       # Dependencies
-├── Dockerfile                         # Container image
-├── cloudbuild.yaml                    # GCP deployment config
-├── next.config.js                     # Next.js config
-└── README.md                          # This file
-```
+If AI Tutor helps you, consider supporting its development!
 
----
+### 🇮🇳 Support via UPI (India)
 
-## 🔧 Configure Dialogflow CX
+<div align="center">
 
-### Get Webhook URL
-```bash
-gcloud run services describe dialogflow-cx-agent-assist --region=us-central1 --format="value(status.url)" --project=chennai-geniai
-```
+![UPI QR Code](upi-qr.png)
 
-Output example: `https://dialogflow-cx-agent-assist-xxxxx-uc.a.run.app`
+**UPI ID:** `naturelabs@axl`
 
-### Add to Dialogflow CX
+*Scan with any UPI app: Google Pay • PhonePe • Paytm • BHIM*
 
-1. **Go to**: https://dialogflow.cloud.google.com/cx/projects/chennai-geniai/locations/us-central1/agents/be40e635-daec-437d-8d1f-d1b97344d773/webhooks
+</div>
 
-2. **Create Webhook**:
-   - Display name: `Agent-Assist-Webhook`
-   - URL: `https://dialogflow-cx-agent-assist-xxxxx-uc.a.run.app/api/webhook`
-   - Timeout: 30 seconds
-   - Save
+### 🌍 International Support
 
-3. **Add to Flow**:
-   - Go to **Default Start Flow** → **Start Page**
-   - Under **Fulfillment**, enable webhook
-   - Select `Agent-Assist-Webhook`
-   - Save
+<div align="center">
+
+[![GitHub Sponsors](https://img.shields.io/badge/❤️_Sponsor-GitHub-pink?style=for-the-badge&logo=github)](https://github.com/sponsors/valarama)
+[![Buy Me A Coffee](https://img.shields.io/badge/☕_Buy_Me_A_Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://www.buymeacoffee.com/valarama)
+[![Ko-fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/valarama)
+
+</div>
 
 ---
 
-## 🧪 Test
-
-### Test Webhook
-```bash
-curl -X POST https://your-service.run.app/api/webhook \
-  -H "Content-Type: application/json" \
-  -d '{"sessionInfo":{"session":"test-123"},"text":"hello","intentInfo":{"displayName":"test"}}'
-```
-
-### Test in Dialogflow CX Simulator
-1. Go to **Test Agent** in Dialogflow CX Console
-2. Type: "What is quantum computing?"
-3. Verify webhook is called
-
-### Check Firestore
-Go to: https://console.firebase.google.com/project/chennai-geniai/firestore
+**Your support helps:**
+- 🔧 Fix bugs and maintain code
+- ✨ Develop new features
+- 📚 Improve documentation
+- 🚀 Keep the project alive
 
 ---
 
-## 📊 API Endpoints
+## 📚 API Documentation
 
-- **POST /api/webhook** - Dialogflow CX webhook handler
-- **GET /api/conversations** - List all conversations from Firestore
-- **GET /api/transcript?sessionId={id}** - Get conversation with AI suggestions
-- **POST /api/chatbot** - AI chatbot endpoint
-
----
-
-## 🔐 Service Accounts
-
-The following service accounts need Firestore access:
-
-- `service-372848468363@gcp-sa-dialogflow.iam.gserviceaccount.com`
-- `372848468363-compute@developer.gserviceaccount.com`
-
-Permissions are granted with the commands in step 3 above.
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/conversations` | GET | Fetch all sessions from Firestore |
+| `/api/transcript?sessionId=X` | GET | Get transcript for specific session |
+| `/api/generate-summary` | POST | Generate AI summary using Vertex AI |
+| `/api/chatbot` | POST | AI tutor chat responses |
+| `/api/ringcentral-call` | POST | Initiate voice call |
+| `/api/ringcentral-video` | POST | Create video meeting |
 
 ---
 
-## 📝 Your Dialogflow CX Agent
+## 🎯 Use Cases
 
-- **Project**: chennai-geniai
-- **Location**: us-central1
-- **Agent ID**: be40e635-daec-437d-8d1f-d1b97344d773
-- **Agent Name**: vertex-tanining
-
----
-
-## ✅ Success Checklist
-
-- [ ] Deployed to Cloud Run
-- [ ] Firestore database created
-- [ ] Permissions granted
-- [ ] Webhook created in Dialogflow CX
-- [ ] Webhook added to flow
-- [ ] Tested with simulator
-- [ ] Data appears in Firestore
+- 🎓 **Education** - Virtual tutoring with AI assistance
+- 🏢 **Corporate Training** - Employee onboarding and upskilling
+- 💼 **Customer Support** - AI-powered agent assistance
+- 🌍 **Remote Learning** - One-on-one coaching sessions
 
 ---
 
-## 📞 Support
+## 🤝 Contributing
 
-View logs:
-```bash
-gcloud logging tail "resource.type=cloud_run_revision" --project=chennai-geniai --limit=50
-```
-
-Check service:
-```bash
-gcloud run services list --project=chennai-geniai
-```
+Contributions welcome! Please:
+1. Fork the repository
+2. Create feature branch: `git checkout -b feature/name`
+3. Commit changes: `git commit -m 'Add feature'`
+4. Push: `git push origin feature/name`
+5. Open Pull Request
 
 ---
 
-**Ready to deploy!** Just run:
-```bash
-gcloud builds submit --config=cloudbuild.yaml --project=chennai-geniai
-```
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) file for details.
+
+---
+
+## 👨‍💻 Author
+
+**Ramamurthy Valavandan**
+
+<div align="center">
+
+[![GitHub](https://img.shields.io/badge/GitHub-valarama-black?style=for-the-badge&logo=github)](https://github.com/valarama)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Ramamurthy_Valavandan-blue?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/ramavala)
+[![Twitter](https://img.shields.io/badge/Twitter-@ChatGPTJob-1DA1F2?style=for-the-badge&logo=twitter)](https://x.com/ChatGPTJob)
+
+</div>
+
+- 📧 Email: chennaigenai@gmail.com
+- 💰 UPI: naturelabs@axl
+
+---
+
+## 🙏 Acknowledgments
+
+- **Google Cloud Platform** for the amazing serverless infrastructure
+- **Anthropic** for Claude AI assistance in development
+- **RingCentral** for communications API
+- **Next.js Team** for the excellent framework
+- All contributors and supporters of this project
+
+---
+
+<div align="center">
+
+**Made with ❤️ using Google Cloud Platform**
+
+If this project helps you, please ⭐ star the repository!
+
+[Report Bug](https://github.com/valarama/ai-tutor/issues) · [Request Feature](https://github.com/valarama/ai-tutor/issues) · [💖 Donate](#support-this-project)
+
+</div>
